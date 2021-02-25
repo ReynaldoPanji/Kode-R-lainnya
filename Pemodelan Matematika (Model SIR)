@@ -1,0 +1,31 @@
+getwd()
+setwd("D:\\R Project")
+ls()
+rm(list=ls(all=TRUE))
+
+#========Menentukan Nilai Parameter Tetap=========#
+parameters <- c(a=500,b=0.00015,c=0.027,d=0.0009,e=0.0001)
+
+#=========Menentukan Nilai Awal Populasi==========#
+initials <- c(S=400000,I=50000,R=250000)
+
+#=========Mendefinisikan Fungsi Pemodelan=========#
+Runge.Kutta <- function(t,initials,parameters){
+  with(as.list(c(initials,parameters)),{
+    dS = -b*(I/(S+I+R))*S-d*S+a
+    dI = b*(I/(S+I+R))-(c+d+e)*I
+    dR = c*I-d*R
+    list(c(dS,dI,dR))
+  })}
+
+#==========Menentukan Banyak Pergerakan===========#
+times <- seq(0,5000,by=1)
+
+#===========Proses Pemodelan Matematika===========#
+library(deSolve)
+out <- ode(y=initials,times=times,func=Runge.Kutta,parms=parameters,method="rk4")
+out
+
+#==============Plot Hasil Pemodelan ==============#
+matplot(out[ ,1], out[ ,2:4],type = "l",xlab="Time",ylab="Population",main = "Runge.Kutta", lwd = 2)
+legend("right", c("S","I","R"), col = 1:2:4, lty = 1:2:4)
